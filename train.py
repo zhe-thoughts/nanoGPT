@@ -116,6 +116,7 @@ data_dir = os.path.join('data', dataset)
 def get_batch(split):
     # We recreate np.memmap every batch to avoid a memory leak, as per
     # https://stackoverflow.com/questions/45132940/numpy-memmap-memory-usage-want-to-iterate-once/61472122#61472122
+    t_0 = time.time()
     if split == 'train':
         data = np.memmap(os.path.join(data_dir, 'train.bin'), dtype=np.uint16, mode='r')
     else:
@@ -128,6 +129,9 @@ def get_batch(split):
         x, y = x.pin_memory().to(device, non_blocking=True), y.pin_memory().to(device, non_blocking=True)
     else:
         x, y = x.to(device), y.to(device)
+
+    t_1 = time.time()
+    print(f"batch fetch time: {t_1 - t_0:.2f}s")
     return x, y
 
 # init these up here, can override if init_from='resume' (i.e. from a checkpoint)
