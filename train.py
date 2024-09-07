@@ -131,7 +131,7 @@ def get_batch(split):
         x, y = x.to(device), y.to(device)
 
     t_1 = time.time()
-    print(f"batch fetch time: {t_1 - t_0:.2f}s")
+    # print(f"batch fetch time: {t_1 - t_0:.2f}s")
     return x, y
 
 # init these up here, can override if init_from='resume' (i.e. from a checkpoint)
