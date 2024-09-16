@@ -21,6 +21,7 @@ import time
 import math
 import pickle
 from contextlib import nullcontext
+import concurrent.futures
 
 import numpy as np
 import torch
@@ -110,6 +111,15 @@ device_type = 'cuda' if 'cuda' in device else 'cpu' # for later use in torch.aut
 # note: float16 data type will automatically use a GradScaler
 ptdtype = {'float32': torch.float32, 'bfloat16': torch.bfloat16, 'float16': torch.float16}[dtype]
 ctx = nullcontext() if device_type == 'cpu' else torch.amp.autocast(device_type=device_type, dtype=ptdtype)
+
+# Function to save checkpoint
+def save_checkpoint(checkpoint, path):
+    start_time = time.time()
+    torch.save(checkpoint, path)
+    checkpoint_size = os.path.getsize(path)
+    end_time = time.time()
+    elapsed_time = end_time - start_time
+    print(f"saved checkpoint of {checkpoint_size} bytes to {path} in {elapsed_time:.2f} seconds")
 
 # poor man's data loader
 data_dir = os.path.join('data', dataset)
@@ -287,7 +297,8 @@ while True:
                     'config': config,
                 }
                 print(f"saving checkpoint to {out_dir}")
-                torch.save(checkpoint, os.path.join(out_dir, 'ckpt.pt'))
+                with concurrent.futures.ThreadPoolExecutor() as executor:
+                    future = executor.submit(save_checkpoint, checkpoint, os.path.join(out_dir, 'ckpt.pt'))
     if iter_num == 0 and eval_only:
         break
 
