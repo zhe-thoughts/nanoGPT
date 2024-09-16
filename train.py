@@ -297,8 +297,9 @@ while True:
                     'config': config,
                 }
                 print(f"saving checkpoint to {out_dir}")
-                with concurrent.futures.ThreadPoolExecutor() as executor:
-                    future = executor.submit(save_checkpoint, checkpoint, os.path.join(out_dir, 'ckpt.pt'))
+                torch.save(checkpoint, os.path.join(out_dir, 'ckpt.pt'))
+                # with concurrent.futures.ThreadPoolExecutor() as executor:
+                #     future = executor.submit(save_checkpoint, checkpoint, os.path.join(out_dir, 'ckpt.pt'))
     if iter_num == 0 and eval_only:
         break
 
